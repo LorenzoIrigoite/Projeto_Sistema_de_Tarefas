@@ -11,20 +11,21 @@ public class TaskManeger {
 
     public void addTask(Task t) {
    
-    String sql = "INSERT INTO tarefas(name, date, lvl, isDone) VALUES(?, ?, ?, ?)";
+    String sql = "INSERT INTO tarefas(id, name, date, lvl, isDone) VALUES(?, ?, ?, ?, ?)";
 
     try (Connection conn = DataBase.connect(); 
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
         
-        // 2. Vincula os dados do seu objeto Task aos '?'
-        pstmt.setString(1, t.getName());
-        pstmt.setString(2, t.getDate());
-        pstmt.setDouble(3, t.getLvl());
-        pstmt.setBoolean(4, t.getIsDone());
+        // Vincula os dados do seu objeto Task aos '?'
+        pstmt.setInt(1, t.getId());
+        pstmt.setString(2, t.getName());
+        pstmt.setString(3, t.getDate());
+        pstmt.setDouble(4, t.getLvl());
+        pstmt.setBoolean(5, t.getIsDone());
 
-        // 3. Executa a gravação no arquivo .db
+        // Executa a gravação no arquivo .db
         pstmt.executeUpdate();
-        System.out.println("Tarefa salva com sucesso no banco!");
+        System.out.println("Tarefa salva com sucesso!");
 
     } catch (SQLException e) {
         System.out.println("Erro ao salvar no banco: " + e.getMessage());
@@ -38,7 +39,7 @@ public class TaskManeger {
             
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
-            System.out.println("Tarefa removida com sucesso do banco!");
+            System.out.println("Tarefa removida com sucesso!");
 
         } catch (SQLException e) {
             System.out.println("Erro ao remover do banco: " + e.getMessage());
@@ -51,16 +52,17 @@ public class TaskManeger {
             System.out.println("Erro ao conectar ao banco de dados");
             return;
         }
-        String sql = "SELECT name, date, lvl, isDone FROM tarefas";
+        String sql = "SELECT id, name, date, lvl, isDone FROM tarefas";
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             
             while (rs.next()) {
+                int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String date = rs.getString("date");
                 double lvl = rs.getDouble("lvl");
                 boolean isDone = rs.getBoolean("isDone");
-                System.out.println("Task: " + name + " | Date: " + date + " | Level: " + lvl + " | Done: " + isDone);
+                System.out.println("Task ID: " + id + " | Task: " + name + " | Date: " + date + " | Level: " + lvl + " | Done: " + isDone);
             }
             
         } catch (SQLException e) {
@@ -73,20 +75,43 @@ public class TaskManeger {
             }
         }
     }
+    public void updateDoneTask(Task t, boolean isDone) {
+   
+    String sql = "UPDATE tarefas SET isDone = ? WHERE id = ?";
 
-    public void listTask(Task x){
-        System.out.println(x.toString());
-            } 
+    try (Connection conn = DataBase.connect(); 
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
         
-    public void checkTask(Task t){
-        if(t.getIsDone() == true){
-            System.out.println("This task is already done!");
-        }
-        else{
-            t.setIsDone(true);
-            System.out.println("Task checked!");
-        }
+        pstmt.setBoolean(1, isDone);
+        pstmt.setInt(2, t.getId());
+
+        pstmt.executeUpdate();
+        System.out.println("Tarefa feita, muito bem!");
+
+    } catch (SQLException e) {
+        System.out.println("Erro ao salvar no banco: " + e.getMessage());
     }
+}
+
+ public void updateDateTask(Task t, String date) {
+   
+    String sql = "UPDATE tarefas SET date = ? WHERE id = ?";
+
+    try (Connection conn = DataBase.connect(); 
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        
+        pstmt.setString(1, date);
+        pstmt.setInt(2, t.getId());
+
+        pstmt.executeUpdate();
+        System.out.println("Data alterada para: "+date);
+
+    } catch (SQLException e) {
+        System.out.println("Erro ao salvar no banco: " + e.getMessage());
+    }
+}
+
+
         
 }
 

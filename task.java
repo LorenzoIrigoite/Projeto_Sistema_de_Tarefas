@@ -1,12 +1,14 @@
 import java.util.ArrayList;
 
 public class Task {
+    private int id;
     private String name;
     private String date;
     private double lvl;
     private boolean isDone;
 
-    public Task(String name, String date, double lvl){
+    public Task(int id, String name, String date, double lvl){
+        this.id = id;
         this.name = name;
         this.date = date;
         this.lvl = lvl;
@@ -45,10 +47,18 @@ public class Task {
     public void setName(String name) {
         this.name = name;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     
     @Override
     public String toString(){
-        return "Task: " + this.name + " | Date: " + this.date + " | Level: " + this.lvl + " | Done: " + this.isDone;
+        return "Task ID: " + this.id + " | Task: " + this.name + " | Date: " + this.date + " | Level: " + this.lvl + " | Done: " + this.isDone;
     }
     
 }
