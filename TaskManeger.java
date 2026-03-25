@@ -1,29 +1,23 @@
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 
 public class TaskManeger {
 
-    private ArrayList<Task> tarefas = new ArrayList<>();
-
-
     public void addTask(Task t) {
    
-    String sql = "INSERT INTO tarefas(id, name, date, lvl, isDone) VALUES(?, ?, ?, ?, ?)";
+    String sql = "INSERT INTO tarefas(id, name, date, horario, isDone) VALUES(?, ?, ?, ?, ?)";
 
     try (Connection conn = DataBase.connect(); 
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
         
-        // Vincula os dados do seu objeto Task aos '?'
         pstmt.setInt(1, t.getId());
         pstmt.setString(2, t.getName());
         pstmt.setString(3, t.getDate());
-        pstmt.setDouble(4, t.getLvl());
+        pstmt.setString(4, t.getHorario());
         pstmt.setBoolean(5, t.getIsDone());
 
-        // Executa a gravação no arquivo .db
         pstmt.executeUpdate();
         System.out.println("Tarefa salva com sucesso!");
 
@@ -52,7 +46,7 @@ public class TaskManeger {
             System.out.println("Erro ao conectar ao banco de dados");
             return;
         }
-        String sql = "SELECT id, name, date, lvl, isDone FROM tarefas";
+        String sql = "SELECT id, name, date, horario, isDone FROM tarefas";
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             
@@ -60,9 +54,9 @@ public class TaskManeger {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String date = rs.getString("date");
-                double lvl = rs.getDouble("lvl");
+                String horario = rs.getString("horario");
                 boolean isDone = rs.getBoolean("isDone");
-                System.out.println("Task ID: " + id + " | Task: " + name + " | Date: " + date + " | Level: " + lvl + " | Done: " + isDone);
+                System.out.println("Task ID: " + id + " | Task: " + name + " | Date: " + date + " | Horario: " + horario + " | Done: " + isDone);
             }
             
         } catch (SQLException e) {

@@ -1,0 +1,204 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ClienteManager {
+
+    private final ArrayList<Cliente> clientes = new ArrayList<>();
+
+    // salva cliente no banco de dados
+    public void salvarCliente(Cliente cliente) {
+        String sql = "INSERT INTO clientes(nome, email, telefone) VALUES(?, ?, ?)";
+
+        try (Connection conn = DataBase.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            pstmt.setString(1, cliente.getNome());
+            pstmt.setString(2, cliente.getEmail());
+            pstmt.setString(3, cliente.getTelefone());
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        cliente.setId(generatedKeys.getInt(1));
+                        System.out.println("Cliente salvo no banco com ID: " + cliente.getId());
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao salvar cliente no banco: " + e.getMessage());
+        }
+    }
+
+    // adiciona a tarefa ao cliente no bd.
+    public void vincularTarefaAoCliente(int clienteId, Task tarefa) {
+        String sql = "INSERT OR IGNORE INTO cliente_tarefas(cliente_id, tarefa_id) VALUES(?, ?)";
+
+        try (Connection conn = DataBase.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, clienteId);
+            pstmt.setInt(2, tarefa.getId());
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Tarefa " + tarefa.getId() + " vinculada ao cliente " + clienteId);
+            } else {
+                System.out.println("Tarefa já estava vinculada ao cliente");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao vincular tarefa ao cliente: " + e.getMessage());
+        }
+    }
+
+    // remove tarefa do cliente no bd.
+    public void desvincularTarefaDoCliente(int clienteId, int tarefaId) {
+        String sql = "DELETE FROM cliente_tarefas WHERE cliente_id = ? AND tarefa_id = ?";
+
+        try (Connection conn = DataBase.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, clienteId);
+            pstmt.setInt(2, tarefaId);
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("Tarefa " + tarefaId + " desvinculada do cliente " + clienteId);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao desvincular tarefa do cliente: " + e.getMessage());
+        }
+    }
+
+    // Carregar clientes com suas tarefas do banco
+    public void carregarClientes() {
+        clientes.clear();
+
+        String sql = "SELECT c.id, c.nome, c.email, c.telefone, " +
+                    "t.id as tarefa_id, t.name, t.date, t.horario, t.isDone " +
+                    "FROM clientes c " +
+                    "LEFT JOIN cliente_tarefas ct ON c.id = ct.cliente_id " +
+                    "LEFT JOIN tarefas t ON ct.tarefa_id = t.id " +
+                    "ORDER BY c.id";
+
+        try (Connection conn = DataBase.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            Map<Integer, Cliente> clienteMap = new HashMap<>();
+
+            while (rs.next()) {
+                int clienteId = rs.getInt("id");
+
+                // Criar cliente se não existe
+                Cliente cliente = clienteMap.get(clienteId);
+                if (cliente == null) {
+                    String nome = rs.getString("nome");
+                    String email = rs.getString("email");
+                    String telefone = rs.getString("telefone");
+                    cliente = new Cliente(clienteId, nome, email, telefone);
+                    clienteMap.put(clienteId, cliente);
+                }
+
+                // Adicionar tarefa se existir
+                int tarefaId = rs.getInt("tarefa_id");
+                if (!rs.wasNull() && rs.getString("name") != null) {
+                    String taskName = rs.getString("name");
+                    String taskDate = rs.getString("date");
+                    String taskHorario = rs.getString("horario");
+                    boolean taskDone = rs.getBoolean("isDone");
+
+                    Task tarefa = new Task(tarefaId, taskName, taskDate, taskHorario);
+                    tarefa.setIsDone(taskDone);
+                    cliente.adicionarTarefa(tarefa);
+                }
+            }
+
+            // Adicionar todos os clientes à lista
+            clientes.addAll(clienteMap.values());
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao carregar clientes: " + e.getMessage());
+        }
+    }
+
+    // Listar todos os clientes (do banco)
+    public void listarClientes() {
+        carregarClientes(); // Carrega do banco antes de listar
+
+        System.out.println("\n=== LISTA DE CLIENTES ===");
+        for (Cliente cliente : clientes) {
+            System.out.println(cliente);
+            System.out.println("---");
+        }
+    }
+
+    // Listar clientes com tarefas pendentes
+    public void listarClientesComTarefasPendentes() {
+        carregarClientes(); // Carrega do banco
+
+        System.out.println("\n=== CLIENTES COM TAREFAS PENDENTES ===");
+        for (Cliente cliente : clientes) {
+            boolean temPendentes = false;
+            for (Task tarefa : cliente.getTarefas()) {
+                if (!tarefa.getIsDone()) {
+                    if (!temPendentes) {
+                        System.out.println("Cliente: " + cliente.getNome());
+                        temPendentes = true;
+                    }
+                    System.out.println("  - " + tarefa.toString());
+                }
+            }
+            if (temPendentes) {
+                System.out.println("---");
+            }
+        }
+    }
+
+    // Marcar tarefa específica de um cliente como concluída
+    public void marcarTarefaClienteComoConcluida(int clienteId, int tarefaId) {
+        // Primeiro marcar no banco de dados das tarefas
+        TaskManeger tm = new TaskManeger();
+        tm.updateDoneTask(new Task(tarefaId, "", "", ""), true);
+
+        // Recarregar clientes para refletir a mudança
+        carregarClientes();
+        System.out.println("Tarefa " + tarefaId + " do cliente " + clienteId + " marcada como concluída!");
+    }
+
+    // Obter cliente por ID
+    public Cliente getClientePorId(int id) {
+        for (Cliente cliente : clientes) {
+            if (cliente.getId() == id) {
+                return cliente;
+            }
+        }
+        return null;
+    }
+
+    // Listar tarefas de um cliente específico
+    public void listarTarefasDoCliente(int clienteId) {
+        Cliente cliente = getClientePorId(clienteId);
+        if (cliente != null) {
+            System.out.println("\n=== TAREFAS DO CLIENTE: " + cliente.getNome() + " ===");
+            if (cliente.temTarefas()) {
+                for (Task tarefa : cliente.getTarefas()) {
+                    System.out.println(tarefa);
+                }
+            } else {
+                System.out.println("Cliente não possui tarefas vinculadas.");
+            }
+        } else {
+            System.out.println("Cliente não encontrado!");
+        }
+    }
+}

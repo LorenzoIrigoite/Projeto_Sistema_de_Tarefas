@@ -1,26 +1,47 @@
 public class Main {
  public static void main(String[] args) {
+    System.out.println("Iniciando programa...");
+    System.out.println("==============================\n");
 
-   DataBase.criarTabela();
-  
-    Task t1 = new Task(1, "Lorenzo", "23/23/23", 3);
-    Task t2 = new Task(2, "Gabriela", "11/10/2006", 2);
-    Task t3 = new Task(3, "loriela", "02/10/2006", 1);
+    try {
+        // Criar tabelas (recriar tabela tarefas para atualizar estrutura)
+        DataBase.recriarTabelaTarefas();
+        DataBase.criarTabelaClientes();
+        DataBase.criarTabelaClienteTarefas();
 
-    TaskManeger sistema = new TaskManeger();
+        System.out.println("Tabelas criadas/atualizadas com sucesso!\n");
+
+        // Criar algumas tarefas
+        Task t1 = new Task(1, "lavar roupa", "23/23/23", "14:30");
+        Task t2 = new Task(2, "Reuniao do trabalho", "23/12/2026", "09:00");
+
+        System.out.println("Tarefas criadas...");
+
+        // Salvar tarefas no banco
+        TaskManeger tm = new TaskManeger();
+        tm.addTask(t1);
+        tm.addTask(t2);
+
+        System.out.println("Tarefas salvas no banco...\n");
+
+        ClienteManager clienteManager = new ClienteManager();
+
+        // Criar um cliente simples
+        Cliente cliente1 = new Cliente("João Silva", "joao@email.com", "(11) 99999-0001");
+
+        System.out.println("Cliente criado...");
+
+        // Salvar cliente no banco
+        clienteManager.salvarCliente(cliente1);
+
+        System.out.println("Cliente salvo com ID: " + cliente1.getId() + "\n");
 
 
-    sistema.addTask(t1);
-    sistema.addTask(t2);
-    sistema.addTask(t3);
-    
-    sistema.listTasks();
-    sistema.removeTask(3);
-    sistema.removeTask(2);
-    sistema.listTasks();
+    } catch (Exception e) {
+        System.out.println("ERRO no programa: " + e.getMessage());
+        e.printStackTrace(); //metodo para ajudar a encontrar os bugd do sql.
+    }
 
-    sistema.updateDoneTask(t1, true);
-    sistema.updateDateTask(t1, "25/03/2026");
-    sistema.listTasks();
- }   
+ }
+
 }

@@ -1,17 +1,15 @@
-import java.util.ArrayList;
-
 public class Task {
     private int id;
     private String name;
     private String date;
-    private double lvl;
+    private String horario;
     private boolean isDone;
 
-    public Task(int id, String name, String date, double lvl){
+    public Task(int id, String name, String date, String horario){
         this.id = id;
         this.name = name;
         this.date = date;
-        this.lvl = lvl;
+        this.horario = horario;
         this.isDone = false;
     }
 
@@ -19,8 +17,8 @@ public class Task {
         return date;
     }
 
-    public double getLvl() {
-        return lvl;
+    public String getHorario() {
+        return horario;
     }
 
     public String getName() {
@@ -40,8 +38,8 @@ public class Task {
         this.date = date;
     }
 
-    public void setLvl(double lvl) {
-        this.lvl = lvl;
+    public void setHorario(String horario) {
+        this.horario = horario;
     }
 
     public void setName(String name) {
@@ -58,7 +56,7 @@ public class Task {
     
     @Override
     public String toString(){
-        return "Task ID: " + this.id + " | Task: " + this.name + " | Date: " + this.date + " | Level: " + this.lvl + " | Done: " + this.isDone;
+        return "Task ID: " + this.id + " | Task: " + this.name + " | Date: " + this.date + " | Horario: " + this.horario + " | Done: " + this.isDone;
     }
     
 }
