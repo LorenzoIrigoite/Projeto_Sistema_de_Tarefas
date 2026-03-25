@@ -21,8 +21,9 @@ public class Main {
             System.out.println("2 - Criar tarefa");
             System.out.println("3 - Vincular tarefa a cliente");
             System.out.println("4 - Listar tarefas");
-            System.out.println("5 - Marcar tarefa como feita");
-            System.out.println("6 - Alterar data de uma tarefa");
+            System.out.println("5 - Listar tarefas de um cliente");
+            System.out.println("6 - Marcar tarefa como feita");
+            System.out.println("7 - Alterar data de uma tarefa");
             System.out.println("0 - Sair");
 
             int option = t.nextInt();
@@ -52,7 +53,15 @@ public class Main {
                 case 4:
                     tm.listTasks();
                     break;
-                case 5:
+                case 5: 
+                    Cliente clienteForTasks = cm.selectCliente();
+                    if (clienteForTasks != null) {
+                        cm.listarTarefasDoCliente(clienteForTasks.getId());
+                    } else {
+                        System.out.println("Cliente não selecionado.");
+                    }
+                    break;
+                case 6:
                     Task taskToMark = tm.selectTask();
                     if (taskToMark != null) {
                         tm.updateDoneTask(taskToMark, true);
@@ -60,7 +69,8 @@ public class Main {
                         System.out.println("Tarefa não selecionada.");
                     }
                     break;
-                case 6:
+                    //ARRUMAR : CLIENTES NAO ESTAO LISTADOS COMO VINCULAODS A UMA TAREFA.
+                case 7:
                     Task taskToUpdate = tm.selectTask();
                     if (taskToUpdate != null) {
                         System.out.println("Digite a nova data para a tarefa (formato: DD-MM-YYYY):");
