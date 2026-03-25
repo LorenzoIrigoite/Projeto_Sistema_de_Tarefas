@@ -2,6 +2,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class TaskManeger {
 
@@ -87,7 +89,7 @@ public class TaskManeger {
     }
 }
 
- public void updateDateTask(Task t, String date) {
+    public void updateDateTask(Task t, String date) {
    
     String sql = "UPDATE tarefas SET date = ? WHERE id = ?";
 
@@ -98,12 +100,62 @@ public class TaskManeger {
         pstmt.setInt(2, t.getId());
 
         pstmt.executeUpdate();
-        System.out.println("Data alterada para: "+date);
+        System.out.println("Data da tarefa atualizada!");
 
     } catch (SQLException e) {
-        System.out.println("Erro ao salvar no banco: " + e.getMessage());
+        System.out.println("Erro ao atualizar data: " + e.getMessage());
     }
 }
+
+    // Selecionar tarefa via lista
+    public Task selectTask() {
+        Connection conn = DataBase.connect();
+        if (conn == null) {
+            System.out.println("Erro ao conectar ao banco de dados");
+            return null;
+        }
+        String sql = "SELECT id, name, date, horario, isDone FROM tarefas";
+        ArrayList<Task> tasks = new ArrayList<>();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String date = rs.getString("date");
+                String horario = rs.getString("horario");
+                boolean isDone = rs.getBoolean("isDone");
+                Task task = new Task(id, name, date, horario);
+                task.setIsDone(isDone);
+                tasks.add(task);
+                System.out.println((tasks.size()) + " - " + task.toString());
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar tarefas: " + e.getMessage());
+        } finally {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                System.out.println("Erro ao fechar conexão: " + e.getMessage());
+            }
+        }
+        
+        if (tasks.isEmpty()) {
+            System.out.println("Nenhuma tarefa encontrada.");
+            return null;
+        }
+        
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Selecione uma tarefa pelo número:");
+        int choice = scanner.nextInt();
+        if (choice > 0 && choice <= tasks.size()) {
+            return tasks.get(choice - 1);
+        } else {
+            System.out.println("Seleção inválida.");
+            return null;
+        }
+    }
 
 
         

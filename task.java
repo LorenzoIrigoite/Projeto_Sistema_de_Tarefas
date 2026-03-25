@@ -1,16 +1,53 @@
+import java.util.Scanner;
 public class Task {
+    private static int nextId = 1;
     private int id;
     private String name;
     private String date;
     private String horario;
     private boolean isDone;
-
+    private Cliente owner;
     public Task(int id, String name, String date, String horario){
         this.id = id;
         this.name = name;
         this.date = date;
         this.horario = horario;
         this.isDone = false;
+        this.owner = null;
+    }
+    public Task(String name, String date, String horario, Cliente owner){
+        this.id = nextId++;
+        this.name = name;
+        this.date = date;
+        this.horario = horario;
+        this.isDone = false;
+        this.owner = owner;
+    }
+
+    public static Task personalTask(Cliente owner){
+        if (owner == null) {
+            System.out.println("Erro: Cliente não pode ser nulo.");
+            return null;
+        }
+        Scanner t = new Scanner(System.in);
+        System.out.println("Digite o nome da tarefa:");
+        String name = t.nextLine();
+        System.out.println("Digite a data da tarefa (formato: DD-MM-YYYY):");
+        String date = t.nextLine();
+        System.out.println("Digite o horário da tarefa (formato: HH:MM):");
+        String horario = t.nextLine();
+        
+        Task task = new Task(name, date, horario, owner);
+        owner.adicionarTarefa(task);
+        
+        TaskManeger tm = new TaskManeger();
+        tm.addTask(task);
+  
+        ClienteManager cm = new ClienteManager();
+        cm.vincularTarefaAoCliente(owner.getId(), task);
+        
+        // t.close(); // Removido para evitar fechar System.in
+        return task;
     }
 
     public String getDate() {
@@ -52,6 +89,14 @@ public class Task {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Cliente getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Cliente owner) {
+        this.owner = owner;
     }
     
     @Override

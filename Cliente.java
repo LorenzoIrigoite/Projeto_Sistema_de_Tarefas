@@ -54,6 +54,7 @@ public class Cliente{
     public void adicionarTarefa(Task tarefa) {
         if (tarefa != null && !tarefas.contains(tarefa)) {
             tarefas.add(tarefa);
+            tarefa.setOwner(this);
         }
     }
 

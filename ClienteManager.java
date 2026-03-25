@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class ClienteManager {
 
@@ -183,6 +184,43 @@ public class ClienteManager {
             }
         }
         return null;
+    }
+
+    // Criar cliente via input do usuário
+    public void createCliente() {
+        Scanner t = new Scanner(System.in);
+        System.out.println("Digite o nome do cliente:");
+        String nome = t.nextLine();
+        System.out.println("Digite o email do cliente:");
+        String email = t.nextLine();
+        System.out.println("Digite o telefone do cliente:");
+        String telefone = t.nextLine();
+        
+        Cliente cliente = new Cliente(nome, email, telefone);
+        salvarCliente(cliente);
+        clientes.add(cliente);
+        // t.close(); // Removido para evitar fechar System.in
+    }
+
+    // Selecionar cliente via lista
+    public Cliente selectCliente() {
+        carregarClientes();
+        if (clientes.isEmpty()) {
+            System.out.println("Nenhum cliente cadastrado.");
+            return null;
+        }
+        System.out.println("Selecione um cliente:");
+        for (int i = 0; i < clientes.size(); i++) {
+            System.out.println((i + 1) + " - " + clientes.get(i).getNome());
+        }
+        Scanner t = new Scanner(System.in);
+        int choice = t.nextInt();
+        if (choice > 0 && choice <= clientes.size()) {
+            return clientes.get(choice - 1);
+        } else {
+            System.out.println("Seleção inválida.");
+            return null;
+        }
     }
 
     // Listar tarefas de um cliente específico
