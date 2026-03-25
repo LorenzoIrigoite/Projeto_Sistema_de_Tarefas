@@ -10,7 +10,7 @@ public class TaskManeger {
 
 
     public void addTask(Task t) {
-    // 1. O comando SQL com marcadores '?' para segurança
+   
     String sql = "INSERT INTO tarefas(name, date, lvl, isDone) VALUES(?, ?, ?, ?)";
 
     try (Connection conn = DataBase.connect(); 
@@ -30,16 +30,18 @@ public class TaskManeger {
         System.out.println("Erro ao salvar no banco: " + e.getMessage());
     }
 }
+    public void removeTask(int id){
+        String sql = "DELETE FROM tarefas WHERE id = ?";
 
+        try (Connection conn = DataBase.connect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            System.out.println("Tarefa removida com sucesso do banco!");
 
-
-   
-    public void removeTask(Task t){
-        if(t != null){
-            tarefas.remove(t);
-        }
-        else{
-            System.out.println("Your task is already empty!");
+        } catch (SQLException e) {
+            System.out.println("Erro ao remover do banco: " + e.getMessage());
         }
     }
 

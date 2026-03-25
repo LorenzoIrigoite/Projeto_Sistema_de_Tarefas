@@ -1,14 +1,16 @@
-import java.util.*;
+import java.util.ArrayList;
 
 public class Task {
     private String name;
     private String date;
     private double lvl;
+    private boolean isDone;
 
     public Task(String name, String date, double lvl){
         this.name = name;
         this.date = date;
         this.lvl = lvl;
+        this.isDone = false;
     }
 
     public String getDate() {
@@ -23,6 +25,15 @@ public class Task {
         return name;
     }
 
+    public boolean getIsDone() {
+        return isDone;
+    }
+
+    public void setIsDone(boolean isDone) {
+        this.isDone = isDone;
+
+    }
+
     public void setDate(String date) {
         this.date = date;
     }
@@ -35,5 +46,9 @@ public class Task {
         this.name = name;
     }
     
+    @Override
+    public String toString(){
+        return "Task: " + this.name + " | Date: " + this.date + " | Level: " + this.lvl + " | Done: " + this.isDone;
+    }
     
 }
