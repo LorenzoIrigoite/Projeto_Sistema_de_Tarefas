@@ -46,7 +46,6 @@ public class Cliente{
         this.telefone = telefone;
     }
 
-    // Métodos para gerenciar múltiplas tarefas
     public ArrayList<Task> getTarefas() {
         return tarefas;
     }
@@ -83,7 +82,7 @@ public class Cliente{
         }
     }
 
-    // Getters e setters para ID
+    
     public int getId() {
         return id;
     }

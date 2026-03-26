@@ -1,173 +1,79 @@
-# ProjetoL - Task Manager com Clientes
+# Sistema de Gerenciamento de Tarefas e Clientes (Java + SQLite)
 
-Sistema de gerenciamento de tarefas e clientes em Java + SQLite.
+Este projeto implementa um pequeno sistema para cadastro de clientes e tarefas (CRUD) com persistência em SQLite. Com o objetivo de ser um material de estudo para eu rever conceitos e aprender novas formas de resolver problemas, tratando o codigo com validação e tratamento de exeçoes espesificos junto com PreparedStatement para evitar SQL injection permitindo parametros seguros
+---
 
-## Funcionalidades
+#  Funcionalidades :
 
-### 🗂️ Gerenciamento de Tarefas
-- Criar tarefas com ID manual
-- Listar todas as tarefas
-- Remover tarefas por ID
-- Atualizar status (concluída/pendente)
-- Atualizar data da tarefa
+- Cadastro de clientes (nome, email, telefone)
+- Cadastro de tarefas (nome, data, horário, status)
+- Associação de tarefas a clientes (N:N)
+- Atualização de status e datas de tarefas
+- Listagem de clientes, tarefas e tarefas específicas por cliente
+- Remoção de clientes/tarefas e remoção de vínculo
+- Proteção de integridade com `UNIQUE` para email/telefone (clientes) e nome (tarefas)
+- Mensagens claras de erros para duplicidade de dados
 
-### 👥 Gerenciamento de Clientes
-- Criar clientes com informações básicas (nome, email, telefone)
-- **Vincular múltiplas tarefas aos clientes** ⭐ **NOVO**
-- Verificar se cliente tem tarefas
-- Marcar tarefa específica do cliente como concluída
-- Desvincular tarefa do cliente
-- Listar clientes com tarefas pendentes
-- Salvar e carregar clientes do banco de dados
-- Listar tarefas de um cliente específico
 
-## Estrutura das Classes
 
-### Task
-- `id`: Identificador único (definido manualmente)
-- `name`: Nome da tarefa
-- `date`: Data da tarefa
-- `horario`: Horário específico da tarefa (ex: "14:30", "09:00")
-- `isDone`: Status da tarefa
+# Tabelas
 
-### Cliente
-- `id`: Identificador único do banco de dados
-- `nome`: Nome do cliente
-- `email`: Email do cliente
-- `telefone`: Telefone do cliente
-- `tarefas`: Lista de objetos Task vinculados (ArrayList<Task>)
+- `tarefas`
+- `id` INTEGER PRIMARY KEY
+- `name` TEXT NOT NULL UNIQUE
+- `date` TEXT NOT NULL
+- `horario` TEXT NOT NULL
+- `isDone` BOOLEAN NOT NULL
 
-### TaskManager
-Gerencia operações no banco de dados para tarefas:
-- `addTask(Task t)`: Salva tarefa no banco
-- `removeTask(int id)`: Remove tarefa por ID
-- `listTasks()`: Lista todas as tarefas
-- `updateDoneTask(Task t, boolean isDone)`: Atualiza status
-- `updateDateTask(Task t, String date)`: Atualiza data
+-`clientes`
+- `id` INTEGER PRIMARY KEY AUTOINCREMENT
+- `nome` TEXT NOT NULL
+- `email` TEXT NOT NULL UNIQUE
+- `telefone` TEXT NOT NULL UNIQUE
 
-### ClienteManager
-Gerencia operações para clientes no banco de dados:
-- `salvarCliente(Cliente cliente)`: Salva cliente no banco
-- `carregarClientes()`: Carrega clientes e suas tarefas do banco
-- `listarClientes()`: Lista todos os clientes com suas tarefas
-- `vincularTarefaAoCliente(int clienteId, Task tarefa)`: Vincula tarefa a cliente
-- `desvincularTarefaDoCliente(int clienteId, int tarefaId)`: Remove vínculo
-- `listarTarefasDoCliente(int clienteId)`: Lista tarefas de um cliente
-- `marcarTarefaClienteComoConcluida(int clienteId, int tarefaId)`: Marca tarefa como concluída
+- `cliente_tarefas`
+- `cliente_id` INTEGER NOT NULL
+- `tarefa_id` INTEGER NOT NULL
+- PRIMARY KEY (`cliente_id`, `tarefa_id`)
+- FOREIGN KEY (`cliente_id`) REFERENCES clientes(id) ON DELETE CASCADE
+- FOREIGN KEY (`tarefa_id`) REFERENCES tarefas(id) ON DELETE CASCADE
 
-## Estrutura do Banco de Dados
 
-### Tabelas
-- **tarefas**: Armazena as tarefas
-- **clientes**: Armazena os clientes
-- **cliente_tarefas**: Tabela de relacionamento N:N entre clientes e tarefas
+#  Arquivos
 
-### Relacionamentos
-- Um cliente pode ter múltiplas tarefas
-- Uma tarefa pode estar vinculada a múltiplos clientes
-- Relacionamento gerenciado pela tabela `cliente_tarefas`
+- `Main.java` – Ponto de entrada do programa (executa inicialização e loop de menu)
+- `App.java` – Menu de operações e roteamento de comandos
+- `Cliente.java` – Modelo de cliente
+- `Task.java` – Modelo de tarefa
+- `ClienteManager.java` – CRUD de clientes + relacionamento com tarefas
+- `TaskManeger.java` – CRUD de tarefas
+- `DataBase.java` – Conexão, criação e manutenção de tabelas SQLite
 
-## Como Usar
+##  Funcionalidades (console)
 
-1. **Compilar o projeto:**
-   ```bash
-   javac -cp ".;sqlite-jdbc.jar" *.java
-   ```
+- Criar cliente
+- Criar tarefa
+- Asociar tarefa a cliente
+- Listar clientes
+- Listar tarefas
+- Listar tarefas de um cliente
+- Marcar tarefa como concluída
+- Atualizar data de tarefa
+- Editar cliente
+- Remover cliente (+ vínculos também)
 
-2. **Executar o programa:**
-   ```bash
-   java -cp ".;sqlite-jdbc.jar" Main
-   ```
+##  Comportamento de erro / validação
 
-3. **Funcionalidades demonstradas:**
-   - Criação de tarefas e clientes
-   - Vinculação de múltiplas tarefas aos clientes
-   - Listagem de clientes e suas tarefas
-   - Marcação de tarefas como concluídas
-   - Desvinculação de tarefas
+- `UNIQUE constraint failed: clientes.email` → impede cadastro de email duplicado
+- `UNIQUE constraint failed: clientes.telefone` → impede cadastro de telefone duplicado
+- `UNIQUE constraint failed: tarefas.name` → impede cadastro de tarefa com nome duplicado
+- Mensagens de erro traduzidas para o usuário em vez de só mostrar exceção crua
 
-## Dependências
 
-- Java 8+
-- SQLite JDBC Driver (sqlite-jdbc.jar)
-- Sistema operacional: Windows/Linux/Mac
+## Proximos passos :
 
-## Arquivos do Projeto
+- Interface (GUI / web)
+- Persistência via transações (rollback em falhas)
+- Pesquisa por atributo do Cliente ou atributo da Tarefa.
+- Tratar metodos que ainda nao estao rodando com a eficiencia desejada.
 
-- `Main.java`: Classe principal com demonstração do sistema
-- `Task.java`: Classe que representa uma tarefa
-- `Cliente.java`: Classe que representa um cliente
-- `TaskManager.java`: Gerenciador de operações de tarefas
-- `ClienteManager.java`: Gerenciador de operações de clientes
-- `DataBase.java`: Utilitários para conexão e criação de tabelas
-- `README.md`: Este arquivo de documentação
-- `vincularTarefaAoCliente(int index, Task tarefa)`: Vincula tarefa
-- `marcarTarefaClienteComoConcluida(int index)`: Marca tarefa como concluída
-- `listarClientesComTarefasPendentes()`: Lista clientes com tarefas pendentes
-
-## Como Usar
-
-### Criando um Cliente
-```java
-Cliente cliente = new Cliente("João Silva", "joao@email.com", "(11) 99999-0001");
-```
-
-### Criando um Cliente com Tarefa
-```java
-Task tarefa = new Task(1, "Revisar código", "25/03/2026", "14:30");
-Cliente cliente = new Cliente("Maria Santos", "maria@email.com", "(11) 99999-0002", tarefa);
-```
-
-### Vinculando Tarefa a Cliente Existente
-```java
-cliente.setTarefa(tarefa);
-```
-
-### Verificando se Cliente tem Tarefa
-```java
-if (cliente.temTarefa()) {
-    System.out.println("Cliente tem tarefa: " + cliente.getTarefa().getName());
-}
-```
-
-### Marcando Tarefa como Concluída
-```java
-cliente.marcarTarefaComoConcluida();
-```
-
-## Banco de Dados
-
-- **Arquivo**: `tarefas.db`
-- **Tabela**: `tarefas`
-- **Driver**: SQLite JDBC
-
-### Estrutura da Tabela
-```sql
-CREATE TABLE tarefas (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    date TEXT NOT NULL,
-    horario TEXT NOT NULL,
-    isDone BOOLEAN NOT NULL
-);
-
-CREATE TABLE clientes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    email TEXT NOT NULL,
-    telefone TEXT NOT NULL,
-    tarefa_id INTEGER,
-    FOREIGN KEY (tarefa_id) REFERENCES tarefas(id)
-);
-```
-
-## Dependências
-
-- Java 8+
-- SQLite JDBC Driver (incluído no classpath do VS Code)
-
-## Executando
-
-1. Abra o projeto no VS Code
-2. Execute a classe `Main.java`
-3. O sistema criará a tabela automaticamente se não existir
