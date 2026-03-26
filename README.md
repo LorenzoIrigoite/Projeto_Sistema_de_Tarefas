@@ -1,6 +1,11 @@
 # Sistema de Gerenciamento de Tarefas e Clientes (Java + SQLite)
 
 Este projeto implementa um sistema simplificado para cadastro de clientes e tarefas (CRUD) com persistência em SQLite e versionamento de código via Git/GitHub. O objetivo é servir como material de estudo para revisão de conceitos e aprendizado de novas formas de resolver problemas, aplicando validações, tratamento de exceções específicas e o uso de PreparedStatement para evitar SQL Injection, garantindo o uso de parâmetros seguros.
+
+Atualmente, a URL de conexão com o banco de dados está declarada diretamente no código fonte (hardcoded).
+Tenho noção que, em um projeto real ou ambiente de produção, esta é uma prática insegura. O correto seria utilizar variáveis de ambiente ou arquivos de configuração (como .env ou application.properties) devidamente ignorados pelo .gitignore. Isso evita a exposição de credenciais e caminhos sensíveis em repositórios públicos.
+
+*Este método está sendo utilizado apenas para facilitar a execução imediata do projeto para fins de estudo.*
 ---
 
 #  Funcionalidades :
