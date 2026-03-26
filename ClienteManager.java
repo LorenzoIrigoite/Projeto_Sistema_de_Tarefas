@@ -95,7 +95,7 @@ public class ClienteManager {
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
-            Map<Integer, Cliente> clienteMap = new HashMap<>();
+            Map<Integer, Cliente> clienteMap = new HashMap<>(); //hash map para rodar em 0(1) 
 
             while (rs.next()) {
                 int clienteId = rs.getInt("id");
@@ -199,7 +199,7 @@ public class ClienteManager {
         Cliente cliente = new Cliente(nome, email, telefone);
         salvarCliente(cliente);
         clientes.add(cliente);
-        // t.close(); // Removido para evitar fechar System.in
+    
     }
 
     // Selecionar cliente via lista
@@ -237,6 +237,105 @@ public class ClienteManager {
             }
         } else {
             System.out.println("Cliente não encontrado!");
+        }
+    }
+
+    // Editar dados do cliente no banco de dados
+    public void editarCliente(Cliente cliente) {
+        Scanner t = new Scanner(System.in);
+        
+        System.out.println("\n=== EDITAR CLIENTE: " + cliente.getNome() + " ===");
+        System.out.println("Digite o novo nome (ou pressione Enter para manter: " + cliente.getNome() + "):");
+        String novoNome = t.nextLine();
+        if (novoNome.isEmpty()) {
+            novoNome = cliente.getNome();
+        }
+        
+        System.out.println("Digite o novo email (ou pressione Enter para manter: " + cliente.getEmail() + "):");
+        String novoEmail = t.nextLine();
+        if (novoEmail.isEmpty()) {
+            novoEmail = cliente.getEmail();
+        }
+        
+        System.out.println("Digite o novo telefone (ou pressione Enter para manter: " + cliente.getTelefone() + "):");
+        String novoTelefone = t.nextLine();
+        if (novoTelefone.isEmpty()) {
+            novoTelefone = cliente.getTelefone();
+        }
+        
+        String sql = "UPDATE clientes SET nome = ?, email = ?, telefone = ? WHERE id = ?";
+        
+        try (Connection conn = DataBase.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, novoNome);
+            pstmt.setString(2, novoEmail);
+            pstmt.setString(3, novoTelefone);
+            pstmt.setInt(4, cliente.getId());
+            
+            int affectedRows = pstmt.executeUpdate();
+            
+            if (affectedRows > 0) {
+                System.out.println("Cliente atualizado com sucesso!");
+                // Atualizar objeto cliente em memória
+                cliente.setNome(novoNome);
+                cliente.setEmail(novoEmail);
+                cliente.setTelefone(novoTelefone);
+            } else {
+                System.out.println("Nenhuma linha foi atualizada.");
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Erro ao editar cliente: " + e.getMessage());
+        }
+    }
+
+    // Deletar cliente do banco de dados
+    public void deletarCliente(int clienteId) {
+        Scanner t = new Scanner(System.in);
+        
+        System.out.println("\n  AVISO: Isso vai deletar o cliente e todas as suas vinculações com tarefas!");
+        System.out.println("Tem certeza? (S/N):");
+        String confirmacao = t.nextLine();
+        
+        if (!confirmacao.equalsIgnoreCase("S")) {
+            System.out.println("Operação cancelada.");
+            return;
+        }
+        
+        String sqlDeleteVinculos = "DELETE FROM cliente_tarefas WHERE cliente_id = ?";
+        String sqlDeleteCliente = "DELETE FROM clientes WHERE id = ?";
+        
+        try (Connection conn = DataBase.connect()) {
+            
+            // Primeiro deleta as vinculações de tarefas
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteVinculos)) {
+                pstmt.setInt(1, clienteId);
+                int vinculosDeletados = pstmt.executeUpdate();
+                System.out.println("Vinculações de tarefas removidas: " + vinculosDeletados);
+            }
+            
+            // Depois deleta o cliente
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteCliente)) {
+                pstmt.setInt(1, clienteId);
+                int affectedRows = pstmt.executeUpdate();
+                
+                if (affectedRows > 0) {
+                    System.out.println("Cliente deletado com sucesso!");
+                 
+                    for (int i = clientes.size() - 1; i >= 0; i--) {
+                        if (clientes.get(i).getId() == clienteId) {
+                            clientes.remove(i);
+                            break; 
+                        }
+                    }
+                } else {
+                    System.out.println("Cliente não encontrado.");
+                }
+            }
+            
+        } catch (SQLException e) {
+            System.out.println("Erro ao deletar cliente: " + e.getMessage());
         }
     }
 }
