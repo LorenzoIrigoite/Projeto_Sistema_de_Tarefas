@@ -27,7 +27,7 @@ public class App {
                 System.out.println("0 - Sair");
 
                 int option = t.nextInt();
-                t.nextLine(); //buffer
+                t.nextLine(); 
 
                 switch (option) {
                     case 1:
@@ -72,7 +72,7 @@ public class App {
                         System.out.println("Tarefa não selecionada.");
                     }
                     break;
-                    //ARRUMAR : CLIENTES NAO ESTAO LISTADOS COMO VINCULAODS A UMA TAREFA.
+                    
                 case 8:
                     Task taskToUpdate = tm.selectTask();
                     if (taskToUpdate != null) {
@@ -113,7 +113,7 @@ public class App {
 
     } catch (Exception e) {
         System.out.println("ERRO no programa: " + e.getMessage());
-        e.printStackTrace(); //metodo para ajudar a encontrar os bugd do sql, usado no trycath.
+        e.printStackTrace();
              }
         }
 }

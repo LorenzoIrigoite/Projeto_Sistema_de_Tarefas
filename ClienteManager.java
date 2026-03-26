@@ -90,7 +90,6 @@ public class ClienteManager {
         }
     }
 
-    // Carregar clientes com suas tarefas do banco
     public void carregarClientes() {
         clientes.clear();
 
@@ -110,7 +109,6 @@ public class ClienteManager {
             while (rs.next()) {
                 int clienteId = rs.getInt("id");
 
-                // Criar cliente se não existe
                 Cliente cliente = clienteMap.get(clienteId);
                 if (cliente == null) {
                     String nome = rs.getString("nome");
@@ -120,7 +118,6 @@ public class ClienteManager {
                     clienteMap.put(clienteId, cliente);
                 }
 
-                // Adicionar tarefa se existir
                 int tarefaId = rs.getInt("tarefa_id");
                 if (!rs.wasNull() && rs.getString("name") != null) {
                     String taskName = rs.getString("name");
@@ -134,7 +131,6 @@ public class ClienteManager {
                 }
             }
 
-            // Adicionar todos os clientes à lista
             clientes.addAll(clienteMap.values());
 
         } catch (SQLException e) {
@@ -142,9 +138,8 @@ public class ClienteManager {
         }
     }
 
-    // Listar todos os clientes (do banco)
     public void listarClientes() {
-        carregarClientes(); // Carrega do banco antes de listar
+        carregarClientes(); 
 
         System.out.println("\n=== LISTA DE CLIENTES ===");
         for (Cliente cliente : clientes) {
@@ -153,9 +148,9 @@ public class ClienteManager {
         }
     }
 
-    // Listar clientes com tarefas pendentes
+
     public void listarClientesComTarefasPendentes() {
-        carregarClientes(); // Carrega do banco
+        carregarClientes(); 
 
         System.out.println("\n=== CLIENTES COM TAREFAS PENDENTES ===");
         for (Cliente cliente : clientes) {
@@ -175,18 +170,17 @@ public class ClienteManager {
         }
     }
 
-    // Marcar tarefa específica de um cliente como concluída
     public void marcarTarefaClienteComoConcluida(int clienteId, int tarefaId) {
-        // Primeiro marcar no banco de dados das tarefas
+   
         TaskManeger tm = new TaskManeger();
         tm.updateDoneTask(new Task(tarefaId, "", "", ""), true);
 
-        // Recarregar clientes para refletir a mudança
+  
         carregarClientes();
         System.out.println("Tarefa " + tarefaId + " do cliente " + clienteId + " marcada como concluída!");
     }
 
-    // Obter cliente por ID
+
     public Cliente getClientePorId(int id) {
         for (Cliente cliente : clientes) {
             if (cliente.getId() == id) {
@@ -196,7 +190,7 @@ public class ClienteManager {
         return null;
     }
 
-    // Criar cliente via input do usuário
+
     public void createCliente() {
         Scanner t = new Scanner(System.in);
         System.out.println("Digite o nome do cliente:");
@@ -212,7 +206,6 @@ public class ClienteManager {
     
     }
 
-    // Selecionar cliente via lista
     public Cliente selectCliente() {
         carregarClientes();
         if (clientes.isEmpty()) {
@@ -233,7 +226,6 @@ public class ClienteManager {
         }
     }
 
-    // Listar tarefas de um cliente específico
     public void listarTarefasDoCliente(int clienteId) {
         Cliente cliente = getClientePorId(clienteId);
         if (cliente != null) {
@@ -250,7 +242,6 @@ public class ClienteManager {
         }
     }
 
-    // Editar dados do cliente no banco de dados
     public void editarCliente(Cliente cliente) {
         Scanner t = new Scanner(System.in);
         
@@ -287,7 +278,7 @@ public class ClienteManager {
             
             if (affectedRows > 0) {
                 System.out.println("Cliente atualizado com sucesso!");
-                // Atualizar objeto cliente em memória
+                
                 cliente.setNome(novoNome);
                 cliente.setEmail(novoEmail);
                 cliente.setTelefone(novoTelefone);
@@ -300,7 +291,7 @@ public class ClienteManager {
         }
     }
 
-    // Deletar cliente do banco de dados
+   
     public void deletarCliente(int clienteId) {
         Scanner t = new Scanner(System.in);
         
@@ -318,14 +309,13 @@ public class ClienteManager {
         
         try (Connection conn = DataBase.connect()) {
             
-            // Primeiro deleta as vinculações de tarefas
+           
             try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteVinculos)) {
                 pstmt.setInt(1, clienteId);
                 int vinculosDeletados = pstmt.executeUpdate();
                 System.out.println("Vinculações de tarefas removidas: " + vinculosDeletados);
             }
-            
-            // Depois deleta o cliente
+           
             try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteCliente)) {
                 pstmt.setInt(1, clienteId);
                 int affectedRows = pstmt.executeUpdate();

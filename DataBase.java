@@ -27,7 +27,6 @@ public class DataBase {
         return "Desconectado com sucesso!";
     }
 
-//tabela tarefas.
     public static void criarTabela() {
         String sql = "CREATE TABLE IF NOT EXISTS tarefas ("
                 + "id INTEGER PRIMARY KEY,"
@@ -44,7 +43,6 @@ public class DataBase {
             System.out.println("Erro ao criar tabela tarefas: " + e.getMessage());
         }
     }
-//tabela clientes.
 
     public static void criarTabelaClientes() {
         String sql = "CREATE TABLE IF NOT EXISTS clientes ("
@@ -61,7 +59,6 @@ public class DataBase {
             System.out.println("Erro ao criar tabela clientes: " + e.getMessage());
         }
     }
-// tabela de relacionamento entre clientes e tarefas.
 
     public static void criarTabelaClienteTarefas() {
         String sql = "CREATE TABLE IF NOT EXISTS cliente_tarefas ("

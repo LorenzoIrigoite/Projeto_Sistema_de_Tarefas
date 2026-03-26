@@ -46,7 +46,7 @@ public class Task {
         ClienteManager cm = new ClienteManager();
         cm.vincularTarefaAoCliente(owner.getId(), task);
         
-        // t.close(); // Removido para evitar fechar System.in
+       
         return task;
     }
 
