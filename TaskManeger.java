@@ -24,7 +24,11 @@ public class TaskManeger {
         System.out.println("Tarefa salva com sucesso!");
 
     } catch (SQLException e) {
-        System.out.println("Erro ao salvar no banco: " + e.getMessage());
+        if (e.getMessage().contains("UNIQUE constraint failed")) {
+            System.out.println("❌ ERRO: Já existe uma tarefa com este nome!");
+        } else {
+            System.out.println("Erro ao salvar no banco: " + e.getMessage());
+        }
     }
 }
     public void removeTask(int id){

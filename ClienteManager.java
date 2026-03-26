@@ -33,8 +33,18 @@ public class ClienteManager {
                 }
             }
 
-        } catch (SQLException e) {
-            System.out.println("Erro ao salvar cliente no banco: " + e.getMessage());
+        } catch (SQLException e) { //mensagem de erro do sql qnd ja tem algo igual
+            if (e.getMessage().contains("UNIQUE constraint failed")) {
+                if (e.getMessage().contains("email")) {
+                    System.out.println(" ERRO: Já existe um cliente com este email!");
+                } else if (e.getMessage().contains("telefone")) {
+                    System.out.println(" ERRO: Já existe um cliente com este telefone!");
+                } else {
+                    System.out.println(" ERRO: Dados duplicados no cadastro do cliente!");
+                }
+            } else {
+                System.out.println("Erro ao salvar cliente no banco: " + e.getMessage());
+            }
         }
     }
 

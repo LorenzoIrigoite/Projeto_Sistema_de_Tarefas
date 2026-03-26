@@ -2,7 +2,7 @@ public class Main {
  public static void main(String[] args) {
   
     try {
-        DataBase.recriarTabelaTarefas();
+        DataBase.criarTabela();
         DataBase.criarTabelaClientes();
         DataBase.criarTabelaClienteTarefas();
         App.executar();
