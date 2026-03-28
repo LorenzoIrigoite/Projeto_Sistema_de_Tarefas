@@ -36,11 +36,27 @@ public class DataBase {
                 + "isDone BOOLEAN NOT NULL"
                 + ");";
 
-        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
+        Connection conn = null;
+        try {
+            conn = connect();
+            if (conn == null) {
+                System.out.println("Erro: Falha ao conectar ao banco de dados para criar tabela tarefas");
+                return;
+            }
+            
+            Statement stmt = conn.createStatement();
+            if (stmt == null) {
+                System.out.println("Erro: Falha ao criar statement para tabela tarefas");
+                return;
+            }
+            
             stmt.execute(sql);
+            stmt.close();
             System.out.println("Tabela tarefas criada com sucesso!");
+        } catch (NullPointerException e) {
+            System.out.println("Erro ao criar tabela tarefas.");
         } catch (Exception e) {
-            System.out.println("Erro ao criar tabela tarefas: " + e.getMessage());
+            System.out.println("Erro ao criar tabela tarefas.");
         }
     }
 
@@ -52,11 +68,27 @@ public class DataBase {
                 + "telefone TEXT NOT NULL UNIQUE"
                 + ");";
 
-        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
+        Connection conn = null;
+        try {
+            conn = connect();
+            if (conn == null) {
+                System.out.println("Erro: Falha ao conectar ao banco de dados para criar tabela clientes");
+                return;
+            }
+            
+            Statement stmt = conn.createStatement();
+            if (stmt == null) {
+                System.out.println("Erro: Falha ao criar statement para tabela clientes");
+                return;
+            }
+            
             stmt.execute(sql);
+            stmt.close();
             System.out.println("Tabela clientes criada com sucesso!");
+        } catch (NullPointerException e) {
+            System.out.println("Erro ao criar tabela clientes.");
         } catch (Exception e) {
-            System.out.println("Erro ao criar tabela clientes: " + e.getMessage());
+            System.out.println("Erro ao criar tabela clientes.");
         }
     }
 
@@ -69,11 +101,27 @@ public class DataBase {
                 + "FOREIGN KEY (tarefa_id) REFERENCES tarefas(id) ON DELETE CASCADE"
                 + ");";
 
-        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
+        Connection conn = null;
+        try {
+            conn = connect();
+            if (conn == null) {
+                System.out.println("Erro: Falha ao conectar ao banco de dados para criar tabela cliente_tarefas");
+                return;
+            }
+            
+            Statement stmt = conn.createStatement();
+            if (stmt == null) {
+                System.out.println("Erro: Falha ao criar statement para tabela cliente_tarefas");
+                return;
+            }
+            
             stmt.execute(sql);
+            stmt.close();
             System.out.println("Tabela cliente_tarefas criada com sucesso!");
+        } catch (NullPointerException e) {
+            System.out.println("Erro ao criar tabela cliente_tarefas.");
         } catch (Exception e) {
-            System.out.println("Erro ao criar tabela cliente_tarefas: " + e.getMessage());
+            System.out.println("Erro ao criar tabela cliente_tarefas.");
         }
     }
 }

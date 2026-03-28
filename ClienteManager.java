@@ -33,7 +33,7 @@ public class ClienteManager {
                 }
             }
 
-        } catch (SQLException e) { //mensagem de erro do sql qnd ja tem algo igual
+        } catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
                 if (e.getMessage().contains("email")) {
                     System.out.println(" ERRO: Já existe um cliente com este email!");
@@ -104,7 +104,7 @@ public class ClienteManager {
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
-            Map<Integer, Cliente> clienteMap = new HashMap<>(); //hash map para rodar em 0(1) 
+            Map<Integer, Cliente> clienteMap = new HashMap<>();
 
             while (rs.next()) {
                 int clienteId = rs.getInt("id");
@@ -139,7 +139,7 @@ public class ClienteManager {
     }
 
     public void listarClientes() {
-        carregarClientes(); 
+        carregarClientes();
 
         System.out.println("\n=== LISTA DE CLIENTES ===");
         for (Cliente cliente : clientes) {
@@ -326,7 +326,7 @@ public class ClienteManager {
                     for (int i = clientes.size() - 1; i >= 0; i--) {
                         if (clientes.get(i).getId() == clienteId) {
                             clientes.remove(i);
-                            break; 
+                            break;
                         }
                     }
                 } else {

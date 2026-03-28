@@ -6,6 +6,10 @@ public class App {
         Scanner t = new Scanner(System.in);
         TaskManeger tm = new TaskManeger();
         ClienteManager cm = new ClienteManager();
+        if (t == null || tm == null || cm == null) {
+            System.out.println("Erro: Falha ao inicializar recursos do programa.");
+            return;
+        }
         System.out.println("Iniciando programa...");
 
         try {
@@ -36,7 +40,7 @@ public class App {
                     case 2:
                         Cliente selectedCliente = cm.selectCliente();
                         if (selectedCliente != null) {
-                            Task.personalTask(selectedCliente);
+                            tm.listTasks();
                         } else {
                             System.out.println("Cliente não selecionado.");
                         }
