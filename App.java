@@ -35,19 +35,26 @@ public class App {
 
                 switch (option) {
                     case 1:
-                        cm.createCliente();
+                        System.out.println("Digite o nome do cliente:");
+                        String nome = t.nextLine();
+                        System.out.println("Digite o email do cliente:");
+                        String email = t.nextLine();
+                        System.out.println("Digite o telefone do cliente:");
+                        String telefone = t.nextLine();
+                        Cliente novoCliente = new Cliente(nome, email, telefone);
+                        cm.salvarCliente(novoCliente);
                         break;
                     case 2:
-                        Cliente selectedCliente = cm.selectCliente();
+                        Cliente selectedCliente = cm.selectCliente(t);
                         if (selectedCliente != null) {
-                            tm.listTasks();
+                            Task.personalTask(selectedCliente, t);
                         } else {
                             System.out.println("Cliente não selecionado.");
                         }
                         break;
                     case 3:
-                        Cliente cliente = cm.selectCliente();
-                        Task tarefa = tm.selectTask();
+                        Cliente cliente = cm.selectCliente(t);
+                        Task tarefa = tm.selectTask(t);
                         if (cliente != null && tarefa != null) {
                             cm.vincularTarefaAoCliente(cliente.getId(), tarefa);
                         } else {
@@ -61,7 +68,7 @@ public class App {
                         tm.listTasks();
                         break;
                     case 6: 
-                    Cliente clienteForTasks = cm.selectCliente();
+                    Cliente clienteForTasks = cm.selectCliente(t);
                     if (clienteForTasks != null) {
                         cm.listarTarefasDoCliente(clienteForTasks.getId());
                     } else {
@@ -69,7 +76,7 @@ public class App {
                     }
                     break;
                 case 7:
-                    Task taskToMark = tm.selectTask();
+                    Task taskToMark = tm.selectTask(t);
                     if (taskToMark != null) {
                         tm.updateDoneTask(taskToMark, true);
                     } else {
@@ -78,7 +85,7 @@ public class App {
                     break;
                     
                 case 8:
-                    Task taskToUpdate = tm.selectTask();
+                    Task taskToUpdate = tm.selectTask(t);
                     if (taskToUpdate != null) {
                         System.out.println("Digite a nova data para a tarefa (formato: DD-MM-YYYY):");
                         String newDate = t.nextLine();
@@ -88,17 +95,17 @@ public class App {
                     }
                     break;
                 case 9:
-                    Cliente clienteToEdit = cm.selectCliente();
+                    Cliente clienteToEdit = cm.selectCliente(t);
                     if (clienteToEdit != null) {
-                        cm.editarCliente(clienteToEdit);
+                        cm.editarCliente(clienteToEdit, t);
                     } else {
                         System.out.println("Cliente não selecionado.");
                     }
                     break;
                 case 10:
-                    Cliente clienteToDelete = cm.selectCliente();
+                    Cliente clienteToDelete = cm.selectCliente(t);
                     if (clienteToDelete != null) {
-                        cm.deletarCliente(clienteToDelete.getId());
+                        cm.deletarCliente(clienteToDelete.getId(), t);
                     } else {
                         System.out.println("Cliente não selecionado.");
                     }

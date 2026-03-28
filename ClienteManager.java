@@ -15,8 +15,13 @@ public class ClienteManager {
     public void salvarCliente(Cliente cliente) {
         String sql = "INSERT INTO clientes(nome, email, telefone) VALUES(?, ?, ?)";
 
-        try (Connection conn = DataBase.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        Connection conn = DataBase.connect();
+        if (conn == null) {
+            System.out.println("Erro ao salvar cliente.");
+            return;
+        }
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, cliente.getNome());
             pstmt.setString(2, cliente.getEmail());
@@ -34,17 +39,22 @@ public class ClienteManager {
             }
 
         } catch (SQLException e) {
-            if (e.getMessage().contains("UNIQUE constraint failed")) {
-                if (e.getMessage().contains("email")) {
+            String errorMessage = e.getMessage() == null ? "" : e.getMessage();
+            if (errorMessage.contains("UNIQUE constraint failed")) {
+                if (errorMessage.contains("email")) {
                     System.out.println(" ERRO: Já existe um cliente com este email!");
-                } else if (e.getMessage().contains("telefone")) {
+                } else if (errorMessage.contains("telefone")) {
                     System.out.println(" ERRO: Já existe um cliente com este telefone!");
                 } else {
                     System.out.println(" ERRO: Dados duplicados no cadastro do cliente!");
                 }
             } else {
-                System.out.println("Erro ao salvar cliente no banco: " + e.getMessage());
+                System.out.println("Erro ao salvar cliente.");
             }
+        } catch (Exception e) {
+            System.out.println("Erro ao salvar cliente.");
+        } finally {
+            DataBase.desconnect(conn);
         }
     }
 
@@ -207,6 +217,10 @@ public class ClienteManager {
     }
 
     public Cliente selectCliente() {
+        return selectCliente(new Scanner(System.in));
+    }
+
+    public Cliente selectCliente(Scanner t) {
         carregarClientes();
         if (clientes.isEmpty()) {
             System.out.println("Nenhum cliente cadastrado.");
@@ -216,8 +230,8 @@ public class ClienteManager {
         for (int i = 0; i < clientes.size(); i++) {
             System.out.println((i + 1) + " - " + clientes.get(i).getNome());
         }
-        Scanner t = new Scanner(System.in);
         int choice = t.nextInt();
+        t.nextLine();
         if (choice > 0 && choice <= clientes.size()) {
             return clientes.get(choice - 1);
         } else {
@@ -243,7 +257,10 @@ public class ClienteManager {
     }
 
     public void editarCliente(Cliente cliente) {
-        Scanner t = new Scanner(System.in);
+        editarCliente(cliente, new Scanner(System.in));
+    }
+
+    public void editarCliente(Cliente cliente, Scanner t) {
         
         System.out.println("\n=== EDITAR CLIENTE: " + cliente.getNome() + " ===");
         System.out.println("Digite o novo nome (ou pressione Enter para manter: " + cliente.getNome() + "):");
@@ -293,7 +310,10 @@ public class ClienteManager {
 
    
     public void deletarCliente(int clienteId) {
-        Scanner t = new Scanner(System.in);
+        deletarCliente(clienteId, new Scanner(System.in));
+    }
+
+    public void deletarCliente(int clienteId, Scanner t) {
         
         System.out.println("\n  AVISO: Isso vai deletar o cliente e todas as suas vinculações com tarefas!");
         System.out.println("Tem certeza? (S/N):");

@@ -14,31 +14,29 @@ public class TaskManeger {
             return;
         }
 
-        String sql = "INSERT INTO tarefas(id, name, date, horario, isDone) VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tarefas(name, date, lvl, horario, isDone) VALUES(?, ?, ?, ?, ?)";
 
-        Connection conn = null;
-        try {
-            conn = DataBase.connect();
+        try (Connection conn = DataBase.connect()) {
             if (conn == null) {
                 System.out.println("Erro: Falha ao conectar ao banco de dados");
                 return;
             }
-            
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            if (pstmt == null) {
-                System.out.println("Erro: Falha ao preparar statement");
-                return;
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                pstmt.setString(1, t.getName());
+                pstmt.setString(2, t.getDate());
+                pstmt.setDouble(3, 0.0);
+                pstmt.setString(4, t.getHorario());
+                pstmt.setBoolean(5, t.getIsDone());
+
+                pstmt.executeUpdate();
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        t.setId(generatedKeys.getInt(1));
+                    }
+                }
+                System.out.println("Tarefa salva com sucesso!");
             }
-
-            pstmt.setInt(1, t.getId());
-            pstmt.setString(2, t.getName());
-            pstmt.setString(3, t.getDate());
-            pstmt.setString(4, t.getHorario());
-            pstmt.setBoolean(5, t.getIsDone());
-
-            pstmt.executeUpdate();
-            pstmt.close();
-            System.out.println("Tarefa salva com sucesso!");
 
         } catch (SQLException e) {
             System.out.println("Erro ao adicionar tarefa.");
@@ -194,8 +192,11 @@ public class TaskManeger {
     }
 
     public Task selectTask() {
+        return selectTask(new Scanner(System.in));
+    }
+
+    public Task selectTask(Scanner scanner) {
         Connection conn = null;
-        Scanner scanner = null;
         try {
             conn = DataBase.connect();
             if (conn == null) {
@@ -246,15 +247,10 @@ public class TaskManeger {
                 return null;
             }
 
-            scanner = new Scanner(System.in);
-            if (scanner == null) {
-                System.out.println("ERRO: Falha ao criar Scanner!");
-                return null;
-            }
-            
             System.out.println("Selecione uma tarefa pelo número:");
             try {
                 int choice = scanner.nextInt();
+                scanner.nextLine();
                 if (choice > 0 && choice <= tasks.size()) {
                     Task selecionada = tasks.get(choice - 1);
                     if (selecionada == null) {

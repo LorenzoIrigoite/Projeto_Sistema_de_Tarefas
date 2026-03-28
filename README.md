@@ -82,3 +82,6 @@ Tenho noção que, em um projeto real ou ambiente de produção, esta é uma pr�
 - Pesquisa por atributo do Cliente ou atributo da Tarefa.
 - Tratar metodos que ainda nao estao rodando com a eficiencia desejada.
 
+## FIX : 
+
+problemas de cadastro de clientes e de conexão com o banco, com tratamento de erros mais estável e execução validada

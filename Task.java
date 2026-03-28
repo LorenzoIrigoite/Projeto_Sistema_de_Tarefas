@@ -25,11 +25,15 @@ public class Task {
     }
 
     public static Task personalTask(Cliente owner){
+        Scanner t = new Scanner(System.in);
+        return personalTask(owner, t);
+    }
+
+    public static Task personalTask(Cliente owner, Scanner t){
         if (owner == null) {
             System.out.println("Erro: Cliente não pode ser nulo.");
             return null;
         }
-        Scanner t = new Scanner(System.in);
         System.out.println("Digite o nome da tarefa:");
         String name = t.nextLine();
         System.out.println("Digite a data da tarefa (formato: DD-MM-YYYY):");
