@@ -213,7 +213,6 @@ public class ClienteManager {
         Cliente cliente = new Cliente(nome, email, telefone);
         salvarCliente(cliente);
         clientes.add(cliente);
-    
     }
 
     public Cliente selectCliente() {

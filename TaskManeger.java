@@ -207,11 +207,6 @@ public class TaskManeger {
             String sql = "SELECT id, name, date, horario, isDone FROM tarefas";
             ArrayList<Task> tasks = new ArrayList<>();
             
-            if (tasks == null) {
-                System.out.println("ERRO: Falha ao criar lista de tarefas!");
-                return null;
-            }
-            
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 if (pstmt == null) {
                     System.out.println("ERRO: Falha ao preparar statement!");
